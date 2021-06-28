@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://src/game_objects/Tetromino/Tetromino.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/game_objects/pieces/s_piece/S_Piece.gd" type="Script" id=2]
+
+[node name="S_Piece" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+_colour = Color( 0.168627, 0.67451, 0.2, 1 )
+
+[node name="BlockA" parent="." index="0"]
+position = Vector2( 0, 30 )
+
+[node name="BlockB" parent="." index="1"]
+position = Vector2( 30, 30 )
+
+[node name="BlockC" parent="." index="2"]
+position = Vector2( 30, 0 )
+
+[node name="BlockD" parent="." index="3"]
+position = Vector2( 60, 0 )

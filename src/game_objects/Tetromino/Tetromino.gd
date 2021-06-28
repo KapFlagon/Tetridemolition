@@ -1,12 +1,20 @@
+tool
+
 extends Node2D
 
 
 class_name Tetromino
 
+signal colour_value_altered
+
 
 # Variables
+onready var _block_a = $BlockA
+onready var _block_b = $BlockB
+onready var _block_c = $BlockC
+onready var _block_d = $BlockD
+onready var _blocks = [_block_a, _block_b, _block_c, _block_d] setget set_blocks, get_blocks
 export var _colour: Color
-var _blocks setget set_blocks, get_blocks
 var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
 
@@ -16,6 +24,7 @@ func _ready() -> void:
 
 
 func _process(delta) -> void:
+	_update_colours()
 	pass
 
 
@@ -38,6 +47,10 @@ func get_moving_speed() -> float:
 
 # Additional functions
 func _update_colours() -> void:
-	_blocks = [$BlockA, $BlockB, $BlockC, $BlockD]
-	for block_element in _blocks:
-		block_element.set_block_colour(_colour)
+	#for block_element in _blocks:
+	#	block_element.set_block_colour(_colour)
+	if (_colour != get_node("BlockA").get_block_colour()):
+		get_node("BlockA").set_block_colour(_colour)
+		get_node("BlockB").set_block_colour(_colour)
+		get_node("BlockC").set_block_colour(_colour)
+		get_node("BlockD").set_block_colour(_colour)
