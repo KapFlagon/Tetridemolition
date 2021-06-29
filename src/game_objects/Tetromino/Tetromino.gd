@@ -54,3 +54,7 @@ func _update_colours() -> void:
 		get_node("BlockB").set_block_colour(_colour)
 		get_node("BlockC").set_block_colour(_colour)
 		get_node("BlockD").set_block_colour(_colour)
+
+
+func print_piece_details() -> String:
+	return "Tetromino parent piece"
