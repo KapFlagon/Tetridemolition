@@ -3,6 +3,13 @@ extends Node
 
 class_name RandomPieceGenerator
 
+var i_piece_scene = preload("res://src/game_objects/pieces/i_piece/I_Piece.tscn")
+var j_piece_scene = preload("res://src/game_objects/pieces/j_piece/J_Piece.tscn")
+var l_piece_scene = preload("res://src/game_objects/pieces/L_piece/L_Piece.tscn")
+var o_piece_scene = preload("res://src/game_objects/pieces/o_piece/O_Piece.tscn")
+var s_piece_scene = preload("res://src/game_objects/pieces/s_piece/S_Piece.tscn")
+var t_piece_scene = preload("res://src/game_objects/pieces/t_piece/T_Piece.tscn")
+var z_piece_scene = preload("res://src/game_objects/pieces/z_piece/Z_Piece.tscn")
 
 var _piece_container_a = []
 var _piece_container_b = []
@@ -38,7 +45,6 @@ func preview_next_three_pieces():
 func _peek_from_single_container(piece_container):
 	var three_pieces = []
 	if piece_container.size() >= 3:
-		var counter = 0
 		three_pieces = _peek_amount_of_pieces(piece_container, 3)
 	return three_pieces
 
@@ -61,10 +67,21 @@ func _peek_amount_of_pieces(piece_container, amount_to_peek):
 		pieces.append(piece_container[item_position])
 		counter +=1
 	return pieces
+	
+
+func preview_next_piece():
+	match _active_container:
+		_E_Containers.CONTAINER_A:
+			return _peek_amount_of_pieces(_piece_container_a, 1)
+		_E_Containers.CONTAINER_B:
+			return _peek_amount_of_pieces(_piece_container_b, 1)
 
 
-func pop_next_piece() -> Tetromino:
-	var next_piece: Tetromino
+#func pop_next_piece() -> Tetromino:
+#	var next_piece: Tetromino
+func pop_next_piece():
+	var next_piece
+
 	match _active_container:
 		_E_Containers.CONTAINER_A:
 			next_piece = _piece_container_a.pop_back()
@@ -80,13 +97,13 @@ func pop_next_piece() -> Tetromino:
 
 
 func _fill_container(container_array) -> void:
-	container_array.append(I_Piece.new())
-	container_array.append(J_Piece.new())
-	container_array.append(L_Piece.new())
-	container_array.append(O_Piece.new())
-	container_array.append(S_Piece.new())
-	container_array.append(T_Piece.new())
-	container_array.append(Z_Piece.new())
+	container_array.append(i_piece_scene.instance())
+	container_array.append(j_piece_scene.instance())
+	container_array.append(l_piece_scene.instance())
+	container_array.append(o_piece_scene.instance())
+	container_array.append(s_piece_scene.instance())
+	container_array.append(t_piece_scene.instance())
+	container_array.append(z_piece_scene.instance())
 	randomize()
 	container_array.shuffle()
 
