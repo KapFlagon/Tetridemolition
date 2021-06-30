@@ -1,5 +1,6 @@
 tool
 
+
 extends Node2D
 
 
@@ -14,12 +15,15 @@ var _current_position: Vector2 setget set_current_position, get_current_position
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	if _block_colour != $ColorRect.color:
+			$ColorRect.color = _block_colour
 	pass # Replace with function body.
 
 
 func _process(delta) -> void:
-	if _block_colour != $ColorRect.color:
-		$ColorRect.color = _block_colour
+	if Engine.editor_hint:
+		if _block_colour != $ColorRect.color:
+			$ColorRect.color = _block_colour
 
 
 # Setters and Getters
