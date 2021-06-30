@@ -5,6 +5,7 @@ extends Node2D
 
 class_name Tetromino
 
+
 signal colour_value_altered
 
 
@@ -20,11 +21,18 @@ var _moving_speed: float setget set_moving_speed, get_moving_speed
 
 
 func _ready() -> void:
+	_update_colours()
+	pass
+
+func _init() -> void:
 	pass
 
 
 func _process(delta) -> void:
-	_update_colours()
+	if Engine.editor_hint:
+		_update_colours()
+	if not Engine.editor_hint:
+		pass
 	pass
 
 
@@ -49,11 +57,11 @@ func get_moving_speed() -> float:
 func _update_colours() -> void:
 	#for block_element in _blocks:
 	#	block_element.set_block_colour(_colour)
-	if (_colour != get_node("BlockA").get_block_colour()):
-		get_node("BlockA").set_block_colour(_colour)
-		get_node("BlockB").set_block_colour(_colour)
-		get_node("BlockC").set_block_colour(_colour)
-		get_node("BlockD").set_block_colour(_colour)
+	if (_colour != $BlockA.get_block_colour()):
+		$BlockA.set_block_colour(_colour)
+		$BlockB.set_block_colour(_colour)
+		$BlockC.set_block_colour(_colour)
+		$BlockD.set_block_colour(_colour)
 
 
 func print_piece_details() -> String:
