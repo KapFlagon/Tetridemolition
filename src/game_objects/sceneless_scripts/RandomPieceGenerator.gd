@@ -44,8 +44,7 @@ func preview_next_three_pieces():
 
 func _peek_from_single_container(piece_container):
 	var three_pieces = []
-	if piece_container.size() >= 3:
-		three_pieces = _peek_amount_of_pieces(piece_container, 3)
+	three_pieces = _peek_amount_of_pieces(piece_container, 3)
 	return three_pieces
 
 
@@ -70,18 +69,12 @@ func _peek_amount_of_pieces(piece_container, amount_to_peek):
 	
 
 func preview_next_piece():
-	match _active_container:
-		_E_Containers.CONTAINER_A:
-			return _peek_amount_of_pieces(_piece_container_a, 1)
-		_E_Containers.CONTAINER_B:
-			return _peek_amount_of_pieces(_piece_container_b, 1)
+	var three_pieces = preview_next_three_pieces()
+	return three_pieces[2]
 
 
-#func pop_next_piece() -> Tetromino:
-#	var next_piece: Tetromino
 func pop_next_piece():
 	var next_piece
-
 	match _active_container:
 		_E_Containers.CONTAINER_A:
 			next_piece = _piece_container_a.pop_back()
