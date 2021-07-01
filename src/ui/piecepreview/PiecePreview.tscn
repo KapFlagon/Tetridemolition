@@ -2,7 +2,7 @@
 
 [ext_resource path="res://src/ui/piecepreview/PiecePreview.gd" type="Script" id=1]
 
-[node name="PiecePreviewUI" type="PanelContainer"]
+[node name="PiecePreview" type="PanelContainer"]
 anchor_right = 0.176
 anchor_bottom = 0.545
 margin_right = -0.224014
@@ -19,6 +19,6 @@ margin_right = 173.0
 margin_bottom = 353.0
 
 [node name="Label" type="Label" parent="VBoxContainer"]
-margin_right = 166.0
+margin_right = 165.0
 margin_bottom = 14.0
 text = "Preview (3 piece)"
