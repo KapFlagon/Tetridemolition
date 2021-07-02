@@ -18,8 +18,7 @@ onready var _blocks = [_block_a, _block_b, _block_c, _block_d] setget set_blocks
 export var _colour: Color
 var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
-var _x_offset: int setget , get_x_offset
-var _y_offset: int setget , get_y_offset
+var _offsets: Vector2 setget , get_offsets
 
 
 func _ready() -> void:
@@ -54,11 +53,8 @@ func set_moving_speed(new_moving_speed: float) -> void:
 func get_moving_speed() -> float:
 	return _moving_speed
 
-func get_x_offset() -> int:
-	return _x_offset
-
-func get_y_offset() -> int: 
-	return _y_offset
+func get_offsets() -> Vector2:
+	return _offsets
 
 
 # Additional functions

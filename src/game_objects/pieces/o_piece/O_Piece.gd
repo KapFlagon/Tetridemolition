@@ -8,8 +8,7 @@ class_name O_Piece
 
 
 func _ready() -> void:
-	_x_offset = 0
-	_y_offset = 0
+	_offsets = Vector2(-30,-30)
 
 
 func print_piece_details() -> String:

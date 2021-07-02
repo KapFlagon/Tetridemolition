@@ -8,13 +8,13 @@ script = ExtResource( 2 )
 _colour = Color( 0.941176, 0.541176, 0.0745098, 1 )
 
 [node name="BlockA" parent="." index="0"]
-position = Vector2( 15, -30 )
+position = Vector2( 15, -45 )
 
 [node name="BlockB" parent="." index="1"]
-position = Vector2( -45, 0 )
+position = Vector2( -45, -15 )
 
 [node name="BlockC" parent="." index="2"]
-position = Vector2( -15, 0 )
+position = Vector2( -15, -15 )
 
 [node name="BlockD" parent="." index="3"]
-position = Vector2( 15, 0 )
+position = Vector2( 15, -15 )
