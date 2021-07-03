@@ -9,16 +9,22 @@ class_name Tetromino
 signal colour_value_altered
 
 
+enum _Piece_Rotations {ZERO, NINETY, ONE_EIGHTY, TWO_SEVENTY,}
+
+
 # Variables
 onready var _block_a = $BlockA
 onready var _block_b = $BlockB
 onready var _block_c = $BlockC
 onready var _block_d = $BlockD
-onready var _blocks = [_block_a, _block_b, _block_c, _block_d] setget set_blocks, get_blocks
+#onready var _blocks = [_block_a, _block_b, _block_c, _block_d] setget set_blocks, get_blocks
 export var _colour: Color
 var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
 var _offsets: Vector2 setget , get_offsets
+var _local_rotation_matrix_dimensions: int setget set_local_rotation_matrix_dimensions, get_local_rotation_matrix_dimensions
+var _local_rotation_matrix setget set_local_rotation_matrix, get_local_rotation_matrix
+var _current_rotation
 
 
 func _ready() -> void:
@@ -38,23 +44,43 @@ func _process(delta) -> void:
 
 
 # Setters and Getters
-func set_blocks(blocks) -> void:
-	_blocks = blocks
-func get_blocks():
-	return _blocks
+#func set_blocks(blocks) -> void:
+#	_blocks = blocks
+	
+#func get_blocks():
+#	return _blocks
+
 
 func set_moving(new_moving: bool) -> void:
 	_moving = new_moving
+	
 func is_moving() -> bool:
 	return _moving
 
+
 func set_moving_speed(new_moving_speed: float) -> void:
 	_moving_speed = new_moving_speed
+	
 func get_moving_speed() -> float:
 	return _moving_speed
 
+
 func get_offsets() -> Vector2:
 	return _offsets
+
+
+func set_local_rotation_matrix_dimensions(new_local_rotation_matrix_dimensions):
+	_local_rotation_matrix_dimensions = new_local_rotation_matrix_dimensions
+
+func get_local_rotation_matrix_dimensions():
+	return _local_rotation_matrix_dimensions
+
+
+func set_local_rotation_matrix(new_local_rotation_matrix):
+	_local_rotation_matrix = new_local_rotation_matrix
+
+func get_local_rotation_matrix():
+	return _local_rotation_matrix
 
 
 # Additional functions
@@ -70,3 +96,10 @@ func _update_colours() -> void:
 
 func print_piece_details() -> String:
 	return "Tetromino parent piece"
+
+
+func _build_local_rotation_matrix():
+	pass
+
+func _build_next_rotation(rotation_array):
+	pass
