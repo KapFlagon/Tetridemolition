@@ -9,9 +9,9 @@ class_name L_Piece
 
 func _ready() -> void:
 	_offsets = Vector2(-45,-45)
-	_current_rotation = _Piece_Rotations.ZERO
 	self._local_rotation_matrix_dimensions = 3
 	_build_local_rotation_matrix()
+	
 
 
 func print_piece_details() -> String:
@@ -20,6 +20,7 @@ func print_piece_details() -> String:
 
 func _build_local_rotation_matrix():
 	
+	# Maybe replace with actual blocks...
 	var first_rotation_row_01 = [false, false, true]	# [ ], [ ], [x]
 	var first_rotation_row_02 = [true, true, true]		# [x], [x], [x]
 	var first_rotation_row_03 = [false, false, false]	# [ ]. [ ], [ ]
@@ -42,7 +43,24 @@ func _build_local_rotation_matrix():
 	
 	var rotations = [ first_rotation, second_rotation, third_rotation, fourth_rotation ]
 	set_local_rotation_matrix(rotations)
+	_current_rotation_matrix = get_local_rotation_matrix()[0]
 
-func _build_next_rotation(rotation_array):
+
+func _build_next_rotation(rotation_array, target_direction):
 	# for later refactorying of the rotation building
+	var old_rotation = rotation_array.duplicate(true)
+	var new_rotation = rotation_array.duplicate(true)
+	var row_iterator = 0
+	var column_iterator = 0
+	if _local_rotation_matrix_dimensions == 3:
+		while row_iterator < _local_rotation_matrix_dimensions:
+			while column_iterator < 3:
+				# TODO revisit this
+				column_iterator += 1
+			row_iterator += 1
+			column_iterator = 0
+				
+		pass
+	if _local_rotation_matrix_dimensions == 4:
+		pass
 	pass
