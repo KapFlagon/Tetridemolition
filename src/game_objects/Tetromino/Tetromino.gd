@@ -24,7 +24,7 @@ var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
 var _offsets: Vector2 setget , get_offsets
 var _local_rotation_matrix_dimensions: int setget set_local_rotation_matrix_dimensions, get_local_rotation_matrix_dimensions
-var _local_rotation_matrix setget set_local_rotation_matrix, get_local_rotation_matrix
+var _base_rotation_matrix setget set_base_rotation_matrix, get_base_rotation_matrix
 var _current_rotation_matrix setget , get_current_rotation_matrix
 
 
@@ -87,11 +87,12 @@ func get_local_rotation_matrix_dimensions():
 	return _local_rotation_matrix_dimensions
 
 
-func set_local_rotation_matrix(new_local_rotation_matrix):
-	_local_rotation_matrix = new_local_rotation_matrix
+func set_base_rotation_matrix(new_base_rotation_matrix):
+	_base_rotation_matrix = new_base_rotation_matrix
+	_current_rotation_matrix = _base_rotation_matrix
 
-func get_local_rotation_matrix():
-	return _local_rotation_matrix
+func get_base_rotation_matrix():
+	return _base_rotation_matrix
 
 
 func get_current_rotation_matrix():
@@ -113,17 +114,68 @@ func print_piece_details() -> String:
 	return "Tetromino parent piece"
 
 
-func _build_local_rotation_matrix():
-	pass
+func _build_base_rotation_matrix():
+	print_rotation_matrix(_base_rotation_matrix)
 
 
-func _build_next_rotation(rotation_array, target_direction):
-	pass
+func _build_next_rotation(target_direction):
+	match target_direction:
+		_Rotation_Direction.RIGHT:
+			return rotate_piece_right()
+		_Rotation_Direction.LEFT:
+			return rotate_piece_left()
 
 
-func rotate_piece_right(grid_local_matrix):
-	pass
+func rotate_piece_right():
+	var existing_matrix = _current_rotation_matrix.duplicate(true)
+	var new_matrix = _current_rotation_matrix.duplicate(true)
+	var x1 = _current_rotation_matrix.size() -1
+	var y1 = 0
+	var x2 = 0 
+	var y2 = 0
+	while x1 >= 0:
+		while y1 < _current_rotation_matrix.size():
+			new_matrix[x2][y2] = existing_matrix[x1][y1]
+			y1 += 1
+			x2 += 1
+		x2 = 0
+		y1 = 0
+		x1 -= 1
+		y2 += 1
+	return new_matrix
+	#print("new matrix, turned right")
+	#print_rotation_matrix(new_matrix)
 
 
-func rotate_piece_left(grid_local_matrix):
-	pass
+func rotate_piece_left():
+	var existing_matrix = _current_rotation_matrix.duplicate(true)
+	var new_matrix = _current_rotation_matrix.duplicate(true)
+	var x1 = 0
+	var y1 = _current_rotation_matrix.size() -1
+	var x2 = 0 
+	var y2 = 0
+	while x1 < _current_rotation_matrix.size():
+		while y1 >= 0:
+			new_matrix[x2][y2] = existing_matrix[x1][y1]
+			y1 -= 1
+			x2 += 1
+		x2 = 0
+		y1 = _current_rotation_matrix.size() -1
+		x1 += 1
+		y2 += 1
+	return new_matrix
+	#print("new matrix, turned left")
+	#print_rotation_matrix(new_matrix)
+
+
+func print_rotation_matrix(rotation_matrix):
+	for row in rotation_matrix:
+		var row_output = ""
+		for col in row:
+			var col_output = ""
+			if col == true:
+				col_output = "[x]"
+			else:
+				col_output = "[ ]"
+			row_output = row_output + col_output
+		print(row_output)
