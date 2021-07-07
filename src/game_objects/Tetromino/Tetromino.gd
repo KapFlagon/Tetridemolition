@@ -121,12 +121,12 @@ func _build_base_rotation_matrix():
 func _build_next_rotation(target_direction):
 	match target_direction:
 		_Rotation_Direction.RIGHT:
-			return rotate_piece_right()
+			return calculate_next_right_rotation()
 		_Rotation_Direction.LEFT:
-			return rotate_piece_left()
+			return calculate_next_left_rotation()
 
 
-func rotate_piece_right():
+func calculate_next_right_rotation():
 	var existing_matrix = _current_rotation_matrix.duplicate(true)
 	var new_matrix = _current_rotation_matrix.duplicate(true)
 	var x1 = _current_rotation_matrix.size() -1
@@ -143,11 +143,9 @@ func rotate_piece_right():
 		x1 -= 1
 		y2 += 1
 	return new_matrix
-	#print("new matrix, turned right")
-	#print_rotation_matrix(new_matrix)
 
 
-func rotate_piece_left():
+func calculate_next_left_rotation():
 	var existing_matrix = _current_rotation_matrix.duplicate(true)
 	var new_matrix = _current_rotation_matrix.duplicate(true)
 	var x1 = 0
@@ -164,8 +162,6 @@ func rotate_piece_left():
 		x1 += 1
 		y2 += 1
 	return new_matrix
-	#print("new matrix, turned left")
-	#print_rotation_matrix(new_matrix)
 
 
 func print_rotation_matrix(rotation_matrix):
