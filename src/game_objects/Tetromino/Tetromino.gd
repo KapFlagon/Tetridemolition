@@ -9,7 +9,8 @@ class_name Tetromino
 signal colour_value_altered
 
 
-enum _Rotation_Direction {LEFT, RIGHT}
+enum _E_Rotation_Direction {LEFT, RIGHT}
+enum _E_Piece_Orientations {ZERO_DEGREES, NINTY_DEGREES, ONEHUNDREDEIGHTY_DEGREES, TWOSEVENTY_DEGREES}
 
 
 # Variables
@@ -23,13 +24,15 @@ export var _colour: Color setget, get_colour
 var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
 var _offsets: Vector2 setget , get_offsets
-var _local_rotation_matrix_dimensions: int setget set_local_rotation_matrix_dimensions, get_local_rotation_matrix_dimensions
-var _base_rotation_matrix setget set_base_rotation_matrix, get_base_rotation_matrix
+var _local_rotation_matrix_dimensions: int setget , get_local_rotation_matrix_dimensions
+var _base_rotation_matrix 
 var _current_rotation_matrix setget , get_current_rotation_matrix
+var _current_piece_orientation: int setget , get_current_piece_orientation
 
 
 func _ready() -> void:
 	_update_colours()
+	_current_piece_orientation = _E_Piece_Orientations.ZERO_DEGREES
 	pass
 
 func _init() -> void:
@@ -80,26 +83,20 @@ func get_offsets() -> Vector2:
 	return _offsets
 
 
-func set_local_rotation_matrix_dimensions(new_local_rotation_matrix_dimensions):
-	_local_rotation_matrix_dimensions = new_local_rotation_matrix_dimensions
-
 func get_local_rotation_matrix_dimensions():
 	return _local_rotation_matrix_dimensions
-
-
-func set_base_rotation_matrix(new_base_rotation_matrix):
-	_base_rotation_matrix = new_base_rotation_matrix
-	_current_rotation_matrix = _base_rotation_matrix
-
-func get_base_rotation_matrix():
-	return _base_rotation_matrix
 
 
 func get_current_rotation_matrix():
 	return _current_rotation_matrix
 
 
-# Additional functions
+func get_current_piece_orientation():
+	return _current_piece_orientation
+
+
+
+# Additional functions: private
 func _update_colours() -> void:
 	#for block_element in _blocks:
 	#	block_element.set_block_colour(_colour)
@@ -120,13 +117,13 @@ func _build_base_rotation_matrix():
 
 func _build_next_rotation(target_direction):
 	match target_direction:
-		_Rotation_Direction.RIGHT:
-			return calculate_next_right_rotation()
-		_Rotation_Direction.LEFT:
-			return calculate_next_left_rotation()
+		_E_Rotation_Direction.RIGHT:
+			return _calculate_next_right_rotation_matrix()
+		_E_Rotation_Direction.LEFT:
+			return _calculate_next_left_rotation_matrix()
 
 
-func calculate_next_right_rotation():
+func _calculate_next_right_rotation_matrix():
 	var existing_matrix = _current_rotation_matrix.duplicate(true)
 	var new_matrix = _current_rotation_matrix.duplicate(true)
 	var x1 = _current_rotation_matrix.size() -1
@@ -145,7 +142,7 @@ func calculate_next_right_rotation():
 	return new_matrix
 
 
-func calculate_next_left_rotation():
+func _calculate_next_left_rotation_matrix():
 	var existing_matrix = _current_rotation_matrix.duplicate(true)
 	var new_matrix = _current_rotation_matrix.duplicate(true)
 	var x1 = 0
@@ -164,6 +161,7 @@ func calculate_next_left_rotation():
 	return new_matrix
 
 
+# Additional Functions : public
 func print_rotation_matrix(rotation_matrix):
 	for row in rotation_matrix:
 		var row_output = ""
@@ -175,3 +173,16 @@ func print_rotation_matrix(rotation_matrix):
 				col_output = "[ ]"
 			row_output = row_output + col_output
 		print(row_output)
+
+
+func _process_wall_kicks(original_orientation, target_orientation, grid_local_matrix):
+	pass
+
+
+func rotate_piece_right(grid_local_matrix):
+	# TODO May need to examine the parameters passed to this further. 
+	pass
+
+
+func rotate_piece_left(grid_local_matrix):
+	pass

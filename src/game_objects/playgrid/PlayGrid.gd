@@ -6,7 +6,7 @@ var _grid_dimensions: Vector2
 var _grid_contents
 var _x_limit
 var _y_limit
-var _active_piece setget set_active_piece
+var _active_piece: Tetromino setget set_active_piece
 var _decent_speed: float setget set_decent_speed
 var _movement_delta
 
@@ -103,3 +103,16 @@ func _copy_active_piece_to_grid():
 	var y_map_02 = og_y / _grid_dimensions.y
 	print("Second position: x - " + str(x_map_02) + "   y - " + str(y_map_02))
 	pass
+
+
+func _get_local_grid_matrix_for_active_piece():
+	# TODO Need to expand the local matrix so that it also accounts for the rotation system. 
+	# Need to pad this matrix by 2 in ALL directions, so a 4x4 piece matrix will return an 8x8 local matrix to be used in rotation system.
+	# TODO need to also account for walls, so if a wall is detected, it and everything past that will be "false" in the matrix.
+	var size_increase = _active_piece.get_local_rotation_matrix_dimensions() - 1
+	var start_position_in_grid = _active_piece.get_grid_position()
+	var local_grid_matrix = []
+	for row_iterator in range(size_increase):
+		for column_iterator in range(size_increase):
+			local_grid_matrix[row_iterator][column_iterator] = _grid_contents[_active_piece.get_grid_position().x + row_iterator][_active_piece.get_grid_position().y + column_iterator]
+	return local_grid_matrix
