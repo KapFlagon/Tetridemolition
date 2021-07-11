@@ -23,5 +23,4 @@ func _build_base_rotation_matrix():
 	var first_rotation_row_02 = [true, true, true]		# [x], [x], [x]
 	var first_rotation_row_03 = [false, false, false]	# [ ]. [ ], [ ]
 	var first_rotation = [first_rotation_row_01, first_rotation_row_02, first_rotation_row_03]
-	
-	set_base_rotation_matrix(first_rotation)
+	_base_rotation_matrix = first_rotation

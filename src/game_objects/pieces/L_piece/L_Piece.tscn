@@ -5,7 +5,7 @@
 
 [node name="L_Piece" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
-_colour = Color( 0.941176, 0.541176, 0.0745098, 1 )
+_colour = Color( 0.937255, 0.419608, 0.109804, 1 )
 
 [node name="BlockA" parent="." index="0"]
 position = Vector2( 15, -45 )
