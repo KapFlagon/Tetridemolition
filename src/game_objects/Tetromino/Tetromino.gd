@@ -9,18 +9,16 @@ class_name Tetromino
 signal colour_value_altered
 
 
-enum _E_Rotation_Direction {LEFT, RIGHT}
-enum _E_Piece_Orientations {ZERO_DEGREES, NINTY_DEGREES, ONEHUNDREDEIGHTY_DEGREES, TWOSEVENTY_DEGREES}
-
-
+##############################################
+##############################################
 # Variables
-var _grid_position: Vector2 setget set_grid_position, get_grid_position
 onready var _block_a = $BlockA
 onready var _block_b = $BlockB
 onready var _block_c = $BlockC
 onready var _block_d = $BlockD
 onready var _blocks = [_block_a, _block_b, _block_c, _block_d] setget set_blocks, get_blocks
 export var _colour: Color setget, get_colour
+var _grid_position: Vector2 setget set_grid_position, get_grid_position
 var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
 var _offsets: Vector2 setget , get_offsets
@@ -28,12 +26,25 @@ var _local_rotation_matrix_dimensions: int setget , get_local_rotation_matrix_di
 var _base_rotation_matrix 
 var _current_rotation_matrix setget , get_current_rotation_matrix
 var _current_piece_orientation: int setget , get_current_piece_orientation
+var _rotation_checks_dictionary = {} setget , get_rotation_checks_dictionary
 
+
+##############################################
+##############################################
 
 func _ready() -> void:
 	_update_colours()
-	_current_piece_orientation = _E_Piece_Orientations.ZERO_DEGREES
-	pass
+	_current_piece_orientation = GameEnums.PIECE_ORIENTATION.ZERO_DEGREES
+	_rotation_checks_dictionary = {
+		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_NINETY: [ [0,0], [-1,0], [-1,1], [0,-2], [-1,-2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ZERO: [ [0,0], [1,0], [1,-1], [0,2], [1,2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ONEHUNDREDEIGHTY: [ [0,0], [1,0], [1,-1], [0,2], [1,2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_NINETY: [ [0,0], [-1,0], [-1,1], [0,-2], [-1,-2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_TWOHUNDREDSEVENTY: [ [0,0], [1,0], [1,1], [0,-2], [1,-2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ONEHUNDREDEIGHTY: [ [0,0], [-1,0], [-1,-1], [0,2], [-1,2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ZERO: [ [0,0], [-1,0], [-1,-1], [0,2], [-1,2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_TWOHUNDREDSEVENTY: [ [0,0], [1,0], [1,1], [0,-2], [1,-2] ],
+	}
 
 func _init() -> void:
 	pass
@@ -47,9 +58,13 @@ func _process(delta) -> void:
 	pass
 
 
+##############################################
+##############################################
 # Setters and Getters
 func set_grid_position(new_grid_position):
 	_grid_position = new_grid_position
+	position.x = (_offsets.x * -1) + (get_block_dimensions().x * new_grid_position.x)
+	position.y = (_offsets.y * -1) + (get_block_dimensions().y * new_grid_position.y)
 
 func get_grid_position():
 	return _grid_position
@@ -61,13 +76,18 @@ func set_blocks(blocks) -> void:
 func get_blocks():
 	return _blocks
 
+
+func get_block_dimensions():
+	return $BlockA.get_block_dimensions()
+
+
 func get_colour():
 	return _colour
 
 
 func set_moving(new_moving: bool) -> void:
 	_moving = new_moving
-	
+
 func is_moving() -> bool:
 	return _moving
 
@@ -95,7 +115,12 @@ func get_current_piece_orientation():
 	return _current_piece_orientation
 
 
+func get_rotation_checks_dictionary():
+	return _rotation_checks_dictionary
 
+
+##############################################
+##############################################
 # Additional functions: private
 func _update_colours() -> void:
 	#for block_element in _blocks:
@@ -117,9 +142,9 @@ func _build_base_rotation_matrix():
 
 func _build_next_rotation(target_direction):
 	match target_direction:
-		_E_Rotation_Direction.RIGHT:
+		GameEnums.ROTATION_DIRECTION.RIGHT:
 			return _calculate_next_right_rotation_matrix()
-		_E_Rotation_Direction.LEFT:
+		GameEnums.ROTATION_DIRECTION.LEFT:
 			return _calculate_next_left_rotation_matrix()
 
 
@@ -161,6 +186,8 @@ func _calculate_next_left_rotation_matrix():
 	return new_matrix
 
 
+##############################################
+##############################################
 # Additional Functions : public
 func print_rotation_matrix(rotation_matrix):
 	for row in rotation_matrix:
