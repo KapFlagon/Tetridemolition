@@ -14,6 +14,8 @@ var test_piece = preload("res://src/game_objects/pieces/L_piece/L_Piece.tscn")
 var _block_instancing = preload("res://src/game_objects/block/Block.tscn")
 
 
+##############################################
+##############################################
 func _ready():
 	_block_dimensions = Vector2(30,30)
 	_grid_dimensions = Vector2(10,22)
@@ -24,7 +26,7 @@ func _ready():
 	for column in range(_grid_dimensions.x - 1):
 		_grid_contents.append([])
 		for rows in range(_grid_dimensions.y - 1):
-			_grid_contents[column].append([])
+			_grid_contents[column].append(false)
 	set_active_piece(test_piece.instance())
 	
 
@@ -45,6 +47,8 @@ func _process(delta):
 	pass
 
 
+##############################################
+##############################################
 # setters and getters
 func set_decent_speed(new_decent_speed: float) -> void:
 	_decent_speed = new_decent_speed
@@ -59,30 +63,32 @@ func set_active_piece(new_active_piece) -> void:
 
 
 func _set_spawn_position():
-	_active_piece.position = Vector2(0,0)
 	_active_piece.set_grid_position(Vector2(3, 0))
-	var pos_x = 0
-	var pos_y = 0
-	var updated_x_offset = _active_piece.get_offsets().x * -1
-	var updated_y_offset = _active_piece.get_offsets().y * -1
-	pos_x = updated_x_offset + (_block_dimensions.x * _active_piece.get_grid_position().x)
-	pos_y = updated_y_offset + (_block_dimensions.y * _active_piece.get_grid_position().y)
-	_active_piece.position = Vector2(pos_x,pos_y)
 
 
 func _move_piece_down(delta):
 	_movement_delta += delta
 	# TODO need a better way to alter the speed etc. 
-	if _movement_delta > 0.2 and _active_piece != null:
+	if _movement_delta > 0.5 and _active_piece != null:
 		# TODO need a better way to determine if a piece is touching a surface, using the rotation matrix. (Might need to rename to collision matrix).
-		if _active_piece.position.y <= _y_limit - 60:
-			_movement_delta = 0
-			var new_grid_position = _active_piece.get_grid_position()
-			new_grid_position.y = new_grid_position.y + 1
-			_active_piece.set_grid_position(new_grid_position)
-			_active_piece.position.y = (_active_piece.get_offsets().x * -1) + _block_dimensions.y * _active_piece.get_grid_position().y
+		_movement_delta = 0
+		var piece_grid_chunk_depth = _active_piece.get_local_rotation_matrix_dimensions() + _active_piece.get_grid_position().y 
+		if piece_grid_chunk_depth < _grid_dimensions.y - 1:
+			# iterate through the piece current rotation matrix, and compare with the same cells in next row down. 
+			_will_downward_piece_collide_with_grid_contents()
+			# HACK For now this just moves things downward in a dumb way, no detection yet. 
+			var old_position_vector = _active_piece.get_grid_position()
+			var new_position_vector = Vector2(old_position_vector.x, old_position_vector.y + 1)
+			_active_piece.set_grid_position(new_position_vector)
+			# TODO start the timer for allowing a piece to slide/rotate before becoming fully fixed
+			# If the next line has a block or wall in the way, it can't go any further. 
+			pass
 		else: 
-			_copy_active_piece_to_grid()
+			if _active_piece != null:
+				# FIXME this is just a dummy line for now, replace later with _copy_active_piece_to_grid()
+				print("done")
+				_active_piece.queue_free()
+			pass
 	pass
 
 
@@ -116,3 +122,22 @@ func _get_local_grid_matrix_for_active_piece():
 		for column_iterator in range(size_increase):
 			local_grid_matrix[row_iterator][column_iterator] = _grid_contents[_active_piece.get_grid_position().x + row_iterator][_active_piece.get_grid_position().y + column_iterator]
 	return local_grid_matrix
+
+
+func _will_downward_piece_collide_with_grid_contents() -> bool:
+	var piece_pos = _active_piece.get_grid_position()
+	var piece_rotation_collision_matrix = _active_piece.get_current_rotation_matrix()
+	
+	
+	var iterator = _active_piece.get_local_rotation_matrix_dimensions() - 1
+	while iterator >= 0:
+		var inner_iterator = 0
+		while inner_iterator < piece_rotation_collision_matrix.size():
+			if piece_rotation_collision_matrix[iterator][inner_iterator] == true:
+				var value = _grid_contents[piece_pos.y + inner_iterator][piece_pos.x + iterator]  # FIXME pick up from here. 
+				if value == true:
+					if piece_pos.y +_active_piece.get_local_rotation_matrix_dimensions() > _y_limit:
+						print("collision detected at bottom")
+			inner_iterator += 1
+		iterator -= 1
+	return false
