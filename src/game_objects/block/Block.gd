@@ -8,6 +8,7 @@ class_name Block
 
 
 # Variables
+var _grid_position: Vector2 setget set_grid_position, get_grid_position
 var _block_dimensions: Vector2 setget set_block_dimensions, get_block_dimensions
 var _block_colour: Color setget set_block_colour, get_block_colour
 var _current_position: Vector2 setget set_current_position, get_current_position
@@ -28,6 +29,13 @@ func _process(delta) -> void:
 
 
 # Setters and Getters
+func set_grid_position(new_grid_position: Vector2) -> void:
+	_grid_position = new_grid_position
+	position.x = _grid_position.x * _block_dimensions.x
+	position.y = _grid_position.y * _block_dimensions.y
+func get_grid_position() -> Vector2:
+	return _grid_position
+
 func set_block_dimensions(new_block_dimensions: Vector2) -> void: 
 	_block_dimensions = new_block_dimensions
 func get_block_dimensions() -> Vector2:
