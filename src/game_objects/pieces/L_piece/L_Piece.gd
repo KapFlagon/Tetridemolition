@@ -8,6 +8,7 @@ class_name L_Piece
 
 
 func _ready() -> void:
+	._ready()
 	_offsets = Vector2(-45,-45)
 	self._local_rotation_matrix_dimensions = 3
 	_build_base_rotation_matrix()
@@ -24,3 +25,4 @@ func _build_base_rotation_matrix():
 	var first_rotation_row_03 = [false, false, false]	# [ ]. [ ], [ ]
 	var first_rotation = [first_rotation_row_01, first_rotation_row_02, first_rotation_row_03]
 	_base_rotation_matrix = first_rotation
+	_current_rotation_matrix = _base_rotation_matrix
