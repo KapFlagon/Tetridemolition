@@ -10,7 +10,7 @@ class_name O_Piece
 func _ready() -> void:
 	._ready()
 	_offsets = Vector2(-30,-30)
-	self._local_rotation_matrix_dimensions = 4
+	self._local_rotation_matrix_dimensions = 3
 	_build_base_rotation_matrix()
 
 
@@ -20,10 +20,19 @@ func print_piece_details() -> String:
 
 func _build_base_rotation_matrix():
 	# Maybe replace with actual blocks...
-	var first_rotation_row_01 = [false, true, true, false]		# [ ], [x], [x], [ ]
-	var first_rotation_row_02 = [false, true, true, false]		# [ ], [x], [x], [ ]
-	var first_rotation_row_03 = [false, false, false, false]	# [ ]. [ ], [ ], [ ]
-	var first_rotation_row_04 = [false, false, false, false]	# [ ]. [ ], [ ], [ ]
-	var first_rotation = [first_rotation_row_01, first_rotation_row_02, first_rotation_row_03, first_rotation_row_03]
+	var first_rotation_row_01 = [$BlockA, $BlockB, null]		# [x], [x], [ ]
+	var first_rotation_row_02 = [$BlockC, $BlockD, null]		# [x], [x], [ ]
+	var first_rotation_row_03 = [null, null, null]			# [ ], [ ], [ ]
+	var first_rotation = [first_rotation_row_01, first_rotation_row_02, first_rotation_row_03]
 	_base_rotation_matrix = first_rotation
 	_current_rotation_matrix = _base_rotation_matrix
+
+
+func _calculate_next_right_rotation_matrix():
+	# Override to actually prevent piece rotation
+	pass
+
+
+func _calculate_next_left_rotation_matrix():
+	# Override to actually prevent piece rotation
+	pass
