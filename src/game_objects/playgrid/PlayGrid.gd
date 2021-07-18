@@ -1,6 +1,9 @@
 extends Node2D
 
 
+signal active_piece_fixed
+signal line_cleared
+
 var _block_dimensions: Vector2
 var _grid_dimensions: Vector2
 var _grid_contents
@@ -27,7 +30,7 @@ func _ready():
 		_grid_contents.append([])
 		for rows in range(_grid_dimensions.y):
 			_grid_contents[column].append(false)
-	set_active_piece(test_piece.instance())
+	#set_active_piece(test_piece.instance())
 	
 
 
@@ -54,8 +57,6 @@ func set_decent_speed(new_decent_speed: float) -> void:
 	_decent_speed = new_decent_speed
 
 func set_active_piece(new_active_piece) -> void:
-	if _active_piece != null:
-		remove_child(_active_piece)
 	_active_piece = new_active_piece
 	# Set position before adding child
 	add_child(_active_piece)
@@ -69,7 +70,7 @@ func _set_spawn_position():
 func _move_piece_down(delta):
 	_movement_delta += delta
 	# TODO need a better way to alter the speed etc. 
-	if _movement_delta > 0.1 and _active_piece != null:
+	if _active_piece != null and _movement_delta > 0.1:
 		# TODO need a better way to determine if a piece is touching a surface, using the rotation matrix. (Might need to rename to collision matrix).
 		_movement_delta = 0
 		#var piece_grid_chunk_depth = _active_piece.get_local_rotation_matrix_dimensions() + _active_piece.get_grid_position().y 
@@ -89,6 +90,7 @@ func _move_piece_down(delta):
 				# FIXME this is just a dummy line for now, replace later with _copy_active_piece_to_grid()
 				print("done")
 				_copy_active_piece_to_grid()
+				emit_signal("active_piece_fixed")
 			pass
 	pass
 
@@ -105,17 +107,18 @@ func _copy_active_piece_to_grid():
 	while col_counter < matrix.size():
 		var row_counter = 0
 		while row_counter < matrix[col_counter].size():
-			if matrix[col_counter][row_counter]:
+			if matrix[row_counter][col_counter]:
 				var resting_block = _block_instancing.instance()
 				resting_block.set_block_colour(piece_colour)
-				var new_block_position = Vector2(piece_final_position.x + col_counter, piece_final_position.x + row_counter)
+				var new_block_position = Vector2(piece_final_position.x + col_counter, piece_final_position.y + row_counter)
 				add_child(resting_block)
 				resting_block.set_grid_position(new_block_position)
-				_grid_contents[col_counter][row_counter] = resting_block
+				_grid_contents[row_counter][col_counter] = resting_block
 			row_counter += 1
 		col_counter += 1
-	remove_child(_active_piece)
-	_active_piece.queue_free()
+	#remove_child(_active_piece)
+	#_active_piece.queue_free()
+	#_active_piece = null
 
 
 func _get_local_grid_matrix_for_active_piece():
