@@ -22,7 +22,7 @@ func _ready():
 	pass # Replace with function body.
 
 
-func _process(delta) -> void:
+func _process(_delta) -> void:
 	if Engine.editor_hint:
 		if _block_colour != $ColorRect.color:
 			$ColorRect.color = _block_colour
