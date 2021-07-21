@@ -20,12 +20,10 @@ func print_piece_details() -> String:
 
 func _build_base_rotation_matrix():
 	# Maybe replace with actual blocks...
-	var first_rotation_row_01 = [$BlockA, $BlockB, null]		# [x], [x], [ ]
-	var first_rotation_row_02 = [$BlockC, $BlockD, null]		# [x], [x], [ ]
-	var first_rotation_row_03 = [null, null, null]			# [ ], [ ], [ ]
-	var first_rotation = [first_rotation_row_01, first_rotation_row_02, first_rotation_row_03]
-	_base_rotation_matrix = first_rotation
-	_current_rotation_matrix = _base_rotation_matrix
+	var row_01 = [$BlockA, $BlockB]		# [x], [x]
+	var row_02 = [$BlockC, $BlockD]		# [x], [x]
+	_base_rotation_matrix = [row_01, row_02]
+	_current_rotation_matrix = _base_rotation_matrix.duplicate(true)
 
 
 func _calculate_next_right_rotation_matrix():
