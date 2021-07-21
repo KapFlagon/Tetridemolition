@@ -50,7 +50,7 @@ func _init() -> void:
 	pass
 
 
-func _process(delta) -> void:
+func _process(_delta) -> void:
 	if Engine.editor_hint:
 		_update_colours()
 	if not Engine.editor_hint:
@@ -202,14 +202,30 @@ func print_rotation_matrix(rotation_matrix):
 		print(row_output)
 
 
-func _process_wall_kicks(original_orientation, target_orientation, grid_local_matrix):
+func _process_wall_kicks(_original_orientation, _target_orientation, _grid_local_matrix):
 	pass
 
 
-func rotate_piece_right(grid_local_matrix):
+func rotate_piece_right(_grid_local_matrix):
 	# TODO May need to examine the parameters passed to this further. 
 	pass
 
 
-func rotate_piece_left(grid_local_matrix):
+func rotate_piece_left(_grid_local_matrix):
 	pass
+
+
+func get_lowest_collision_row():
+	var lowest_matrix_collision_row = get_current_rotation_matrix().size()
+	var row_iterator = get_current_rotation_matrix().size() - 1
+	var limit = get_current_rotation_matrix().size()
+	while row_iterator >= 0:
+		var col_iterator = 0
+		while col_iterator < limit:
+			if _current_rotation_matrix[row_iterator][col_iterator] is Block:
+				lowest_matrix_collision_row = row_iterator
+				col_iterator = get_current_rotation_matrix().size()
+				row_iterator = 0
+			col_iterator += 1
+		row_iterator -= 1
+	return lowest_matrix_collision_row
