@@ -29,11 +29,15 @@ func print_piece_details() -> String:
 
 
 func _build_base_rotation_matrix():
-	# Maybe replace with actual blocks...
-	var first_rotation_row_01 = [null, null, null, null]					# [ ], [ ], [ ], [ ]
-	var first_rotation_row_02 = [$BlockA, $BlockB, $BlockC, $BlockD]		# [x], [x], [x], [x]
-	var first_rotation_row_03 = [null, null, null, null]					# [ ]. [ ], [ ], [ ]
-	var first_rotation_row_04 = [null, null, null, null]					# [ ]. [ ], [ ], [ ]
-	var first_rotation = [first_rotation_row_01, first_rotation_row_02, first_rotation_row_03, first_rotation_row_03]
-	_base_rotation_matrix = first_rotation
-	_current_rotation_matrix = _base_rotation_matrix
+	var row_01 = [null, null, null, null]					# [ ], [ ], [ ], [ ]
+	var row_02 = [$BlockA, $BlockB, $BlockC, $BlockD]		# [x], [x], [x], [x]
+	var row_03 = [null, null, null, null]					# [ ]. [ ], [ ], [ ]
+	var row_04 = [null, null, null, null]					# [ ]. [ ], [ ], [ ]
+	_base_rotation_matrix = [row_01, row_02, row_03, row_04]
+	_current_rotation_matrix = _base_rotation_matrix.duplicate(true)
+
+
+func set_grid_position(new_grid_position):
+	_grid_position = new_grid_position
+	position.x = (_offsets.x * -1) + (get_block_dimensions().x * new_grid_position.x)
+	position.y = (_offsets.y * -1) + (get_block_dimensions().y * new_grid_position.y) + get_block_dimensions().y
