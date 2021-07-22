@@ -2,7 +2,8 @@ extends Node2D
 
 
 signal active_piece_fixed
-signal line_cleared
+signal lines_cleared
+signal game_over
 
 var _block_dimensions: Vector2
 var _grid_dimensions: Vector2
@@ -10,8 +11,13 @@ var _grid_contents
 var _x_limit
 var _y_limit
 var _active_piece: Tetromino setget set_active_piece
+var _input_hold_delta: float
 var _decent_speed: float setget set_decent_speed
-var _movement_delta
+var _soft_drop_speed: float
+var _horizontal_movement_speed: float
+var _vertical_movement_delta: float
+var _horizontal_movement_delta: float
+var _hold_input_threshold: float
 
 
 var _block_instancing = preload("res://src/game_objects/block/Block.tscn")
@@ -24,7 +30,13 @@ func _ready():
 	_grid_dimensions = Vector2(10,22)
 	_x_limit = _block_dimensions.x * (_grid_dimensions.x - 1)
 	_y_limit = _block_dimensions.y * (_grid_dimensions.y - 1)
-	_movement_delta = 0
+	_input_hold_delta = 0.0
+	_decent_speed = 0.9
+	_soft_drop_speed = 0.3
+	_horizontal_movement_speed = 0.015
+	_vertical_movement_delta = 0.0
+	_horizontal_movement_delta = 0.0
+	_hold_input_threshold = 0.18
 	_grid_contents = []
 	for column in range(_grid_dimensions.x):
 		_grid_contents.append([])
@@ -33,19 +45,9 @@ func _ready():
 
 
 func _process(delta):
-	# detect if user movement input is detected 
-		# detect if user movement is allowed 
-			# perform movement
-	# detect if user rotation input is detected
-		# detect if user rotation is allowed
-			# perform rotation
-	# detect if gravity movement is allowed
-		# move piece downward if movement allowed
-	# detect if piece is resting on other pieces
-		# start timer
-			# lock pieces in place by moving them to the grid
+	_process_user_input(delta)
 	_move_piece_down(delta)
-	pass
+	_update_projected_piece()
 
 
 ##############################################
@@ -68,11 +70,47 @@ func _set_spawn_position():
 		_active_piece.set_grid_position(Vector2(3, 0))
 
 
+func _process_user_input(delta):
+	var piece_current_position = _active_piece.get_grid_position()
+	
+	if Input.is_action_just_pressed("move_left"):
+		var direction_vector = Vector2(-1, 0)
+		if _can_piece_move_horizontally(direction_vector):
+			_move_piece_in_direction_using_vector(piece_current_position, direction_vector)
+	if Input.is_action_just_pressed("move_right"):
+		var direction_vector = Vector2(1, 0)
+		if _can_piece_move_horizontally(direction_vector):
+			_move_piece_in_direction_using_vector(piece_current_position, direction_vector)
+	if Input.is_action_pressed("move_left"):
+		var direction_vector = Vector2(-1, 0)
+		if _can_piece_move_horizontally(direction_vector):
+			_process_held_movement_inputs(delta, piece_current_position, direction_vector)
+	if Input.is_action_pressed("move_right"):
+		var direction_vector = Vector2(1, 0)
+		if _can_piece_move_horizontally(direction_vector):
+			_process_held_movement_inputs(delta, piece_current_position, direction_vector)
+	if Input.is_action_just_released("move_left") or Input.is_action_just_released("move_right") or Input.is_action_just_released("soft_drop"):
+		_input_hold_delta = 0
+		_horizontal_movement_delta = 0
+	if Input.is_action_pressed("soft_drop") and _input_hold_delta > _hold_input_threshold:
+		pass
+	if Input.is_action_just_pressed("hard_drop"):
+		pass
+	if Input.is_action_just_pressed("rotate_right"):
+		pass
+	if Input.is_action_just_pressed("rotate_left"):
+		pass
+	if Input.is_action_just_pressed("hold_piece"):
+		pass
+	if Input.is_action_just_pressed("pause_game"):
+		pass
+
+
 func _move_piece_down(delta):
-	_movement_delta += delta
+	_vertical_movement_delta += delta
 	# TODO need a better way to alter the speed etc. 
-	if _active_piece != null and _movement_delta > 0.1:
-		_movement_delta = 0
+	if _active_piece != null and _vertical_movement_delta > _decent_speed:
+		_vertical_movement_delta = 0
 		if _can_piece_move_down():
 			var old_position_vector = _active_piece.get_grid_position()
 			var new_position_vector = Vector2(old_position_vector.x, old_position_vector.y + 1)
@@ -113,6 +151,7 @@ func _can_piece_move_down() -> bool:
 	if (piece_pos.y + lowest_matrix_collision_row) == (_grid_dimensions.y - 1):
 		return false
 	elif (piece_pos.y + lowest_matrix_collision_row) < (_grid_dimensions.y - 1):
+		# FIXME: Asymmetrical active_piece (s and z piece) are not correctly detecting collisions and are floating above their intended place.
 		var matrix_column_iterator = 0
 		while matrix_column_iterator < piece_rotation_collision_matrix_size:
 			var next_grid_item = _grid_contents[piece_pos.x + matrix_column_iterator][piece_pos.y + lowest_matrix_collision_row + 1]
@@ -120,6 +159,43 @@ func _can_piece_move_down() -> bool:
 				return false
 			matrix_column_iterator += 1
 		return true
+	else:
+		return false
+
+
+func _can_piece_move_horizontally(direction_vector: Vector2) -> bool:
+	var piece_pos = _active_piece.get_grid_position()
+	var piece_rotation_collision_matrix_size = _active_piece.get_current_rotation_matrix().size()
+	# REFACTOR: May need to refactor the below two conditions into something a bit tidier
+	if direction_vector.x > 0:
+		var last_collsion_col = _active_piece.get_last_collision_column()
+		if (piece_pos.x + last_collsion_col) == (_grid_dimensions.x - 1):
+			return false
+		elif (piece_pos.x + last_collsion_col) < (_grid_dimensions.x - 1):
+			var matrix_column_iterator = 0
+			while matrix_column_iterator < piece_rotation_collision_matrix_size:
+				var next_grid_item = _grid_contents[piece_pos.x + last_collsion_col + 1][piece_pos.y]
+				if next_grid_item is Block:
+					return false
+				matrix_column_iterator += 1
+			return true
+		else:
+			return false
+	
+	elif direction_vector.x < 0:
+		var first_collsion_col = _active_piece.get_first_collision_column()
+		if (piece_pos.x + first_collsion_col) <= 0:
+			return false
+		if (piece_pos.x + first_collsion_col) > 0:
+			var matrix_column_iterator = 0
+			while matrix_column_iterator < piece_rotation_collision_matrix_size:
+				var next_grid_item = _grid_contents[piece_pos.x + first_collsion_col - 1][piece_pos.y]
+				if next_grid_item is Block:
+					return false
+				matrix_column_iterator += 1
+			return true
+		else:
+			return false
 	else:
 		return false
 
@@ -156,3 +232,28 @@ func _print_the_grid():
 	logging_file.open("res://logging.txt", File.READ_WRITE)
 	logging_file.store_string(full_content)
 	logging_file.close()
+
+
+func _update_projected_piece():
+	pass
+
+
+func _on_PlayGrid_active_piece_fixed():
+	# Check for any line clears
+	pass # Replace with function body.
+
+
+func _process_held_movement_inputs(delta, piece_current_position, direction_vector):
+	if _input_hold_delta > _hold_input_threshold:
+		if _horizontal_movement_delta > _horizontal_movement_speed:
+			_move_piece_in_direction_using_vector(piece_current_position, direction_vector)
+			_horizontal_movement_delta = 0
+		else:
+			_horizontal_movement_delta += delta
+	else:
+		_input_hold_delta += delta
+
+
+func _move_piece_in_direction_using_vector(piece_current_position, direction_vector): 
+	var new_position = piece_current_position + direction_vector
+	_active_piece.set_grid_position(new_position)
