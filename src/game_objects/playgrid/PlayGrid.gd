@@ -31,7 +31,7 @@ func _ready():
 	_x_limit = _block_dimensions.x * (_grid_dimensions.x - 1)
 	_y_limit = _block_dimensions.y * (_grid_dimensions.y - 1)
 	_input_hold_delta = 0.0
-	_decent_speed = 0.9
+	_decent_speed = 0.1
 	_soft_drop_speed = 0.3
 	_horizontal_movement_speed = 0.015
 	_vertical_movement_delta = 0.0
@@ -127,40 +127,42 @@ func _copy_active_piece_to_grid():
 	var piece_final_position = _active_piece.get_grid_position()
 	var piece_colour = _active_piece.get_colour()
 	var matrix = _active_piece.get_current_rotation_matrix()
-	var col_counter = 0
-	while col_counter < matrix.size():
-		var row_counter = 0
-		while row_counter < matrix.size():
-			if matrix[row_counter][col_counter] is Block:
+	var row_counter = 0
+	while row_counter < matrix.size():
+		var column_counter = 0
+		while column_counter < matrix.size():
+			if matrix[column_counter][row_counter] is Block:
 				var resting_block = _block_instancing.instance()
 				resting_block.set_block_colour(piece_colour)
-				var new_block_position = Vector2(piece_final_position.x + col_counter, piece_final_position.y + row_counter)
+				var new_block_position = Vector2(piece_final_position.x + column_counter, piece_final_position.y + row_counter)
 				add_child(resting_block)
 				resting_block.set_grid_position(new_block_position)
-				_grid_contents[piece_final_position.x + col_counter][piece_final_position.y + row_counter] = resting_block
-			row_counter += 1
-		col_counter += 1
+				_grid_contents[piece_final_position.x + column_counter][piece_final_position.y + row_counter] = resting_block
+			column_counter += 1
+		row_counter += 1
 	#_print_the_grid()
 
 
 func _can_piece_move_down() -> bool:
 	var piece_pos = _active_piece.get_grid_position()
-	var piece_rotation_collision_matrix_size = _active_piece.get_current_rotation_matrix().size()
-	var lowest_matrix_collision_row = _active_piece.get_lowest_collision_row()
+	var rotation_collision_matrix = _active_piece.get_current_rotation_matrix().duplicate(true)
+	var matrix_size = rotation_collision_matrix.size()
 	
-	if (piece_pos.y + lowest_matrix_collision_row) == (_grid_dimensions.y - 1):
-		return false
-	elif (piece_pos.y + lowest_matrix_collision_row) < (_grid_dimensions.y - 1):
-		# FIXME: Asymmetrical active_piece (s and z piece) are not correctly detecting collisions and are floating above their intended place.
+	var matrix_row_iterator = matrix_size - 1
+	while matrix_row_iterator >= 0:
 		var matrix_column_iterator = 0
-		while matrix_column_iterator < piece_rotation_collision_matrix_size:
-			var next_grid_item = _grid_contents[piece_pos.x + matrix_column_iterator][piece_pos.y + lowest_matrix_collision_row + 1]
-			if next_grid_item is Block:
-				return false
+		while matrix_column_iterator < matrix_size:	
+			var matrix_item = rotation_collision_matrix[matrix_column_iterator][matrix_row_iterator]
+			if matrix_item is Block:
+				if piece_pos.y + matrix_row_iterator + 1 >= _grid_dimensions.y:
+					return false
+				else: 
+					var grid_item = _grid_contents[piece_pos.x + matrix_column_iterator][piece_pos.y + matrix_row_iterator + 1]
+					if grid_item is Block:
+						return false
 			matrix_column_iterator += 1
-		return true
-	else:
-		return false
+		matrix_row_iterator -= 1
+	return true
 
 
 func _can_piece_move_horizontally(direction_vector: Vector2) -> bool:
