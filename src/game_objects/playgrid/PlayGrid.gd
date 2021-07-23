@@ -98,10 +98,6 @@ func _process_user_input(delta):
 		pass
 	if Input.is_action_just_pressed("rotate_left"):
 		pass
-	if Input.is_action_just_pressed("hold_piece"):
-		pass
-	if Input.is_action_just_pressed("pause_game"):
-		pass
 
 
 func _move_piece_down(delta):
