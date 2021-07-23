@@ -72,23 +72,21 @@ func _set_spawn_position():
 
 func _process_user_input(delta):
 	var piece_current_position = _active_piece.get_grid_position()
+	var left_direction_vector = Vector2(-1, 0)
+	var right_direction_vector = Vector2(1, 0)
 	
 	if Input.is_action_just_pressed("move_left"):
-		var direction_vector = Vector2(-1, 0)
-		if _can_piece_move_horizontally(direction_vector):
-			_move_piece_in_direction_using_vector(piece_current_position, direction_vector)
+		if _can_piece_move_left():
+			_move_piece_in_direction_using_vector(piece_current_position, left_direction_vector)
 	if Input.is_action_just_pressed("move_right"):
-		var direction_vector = Vector2(1, 0)
-		if _can_piece_move_horizontally(direction_vector):
-			_move_piece_in_direction_using_vector(piece_current_position, direction_vector)
+		if _can_piece_move_right():
+			_move_piece_in_direction_using_vector(piece_current_position, right_direction_vector)
 	if Input.is_action_pressed("move_left"):
-		var direction_vector = Vector2(-1, 0)
-		if _can_piece_move_horizontally(direction_vector):
-			_process_held_movement_inputs(delta, piece_current_position, direction_vector)
+		if _can_piece_move_left():
+			_process_held_movement_inputs(delta, piece_current_position, left_direction_vector)
 	if Input.is_action_pressed("move_right"):
-		var direction_vector = Vector2(1, 0)
-		if _can_piece_move_horizontally(direction_vector):
-			_process_held_movement_inputs(delta, piece_current_position, direction_vector)
+		if _can_piece_move_right():
+			_process_held_movement_inputs(delta, piece_current_position, right_direction_vector)
 	if Input.is_action_just_released("move_left") or Input.is_action_just_released("move_right") or Input.is_action_just_released("soft_drop"):
 		_input_hold_delta = 0
 		_horizontal_movement_delta = 0
@@ -165,41 +163,48 @@ func _can_piece_move_down() -> bool:
 	return true
 
 
-func _can_piece_move_horizontally(direction_vector: Vector2) -> bool:
+func _can_piece_move_left() -> bool:
 	var piece_pos = _active_piece.get_grid_position()
-	var piece_rotation_collision_matrix_size = _active_piece.get_current_rotation_matrix().size()
-	# REFACTOR: May need to refactor the below two conditions into something a bit tidier
-	if direction_vector.x > 0:
-		var last_collsion_col = _active_piece.get_last_collision_column()
-		if (piece_pos.x + last_collsion_col) == (_grid_dimensions.x - 1):
-			return false
-		elif (piece_pos.x + last_collsion_col) < (_grid_dimensions.x - 1):
-			var matrix_column_iterator = 0
-			while matrix_column_iterator < piece_rotation_collision_matrix_size:
-				var next_grid_item = _grid_contents[piece_pos.x + last_collsion_col + 1][piece_pos.y]
-				if next_grid_item is Block:
-					return false
-				matrix_column_iterator += 1
-			return true
-		else:
-			return false
+	var rotation_collision_matrix = _active_piece.get_current_rotation_matrix().duplicate(true)
+	var matrix_size = rotation_collision_matrix.size()
+	var matrix_column_iterator = 0
 	
-	elif direction_vector.x < 0:
-		var first_collsion_col = _active_piece.get_first_collision_column()
-		if (piece_pos.x + first_collsion_col) <= 0:
-			return false
-		if (piece_pos.x + first_collsion_col) > 0:
-			var matrix_column_iterator = 0
-			while matrix_column_iterator < piece_rotation_collision_matrix_size:
-				var next_grid_item = _grid_contents[piece_pos.x + first_collsion_col - 1][piece_pos.y]
-				if next_grid_item is Block:
+	while matrix_column_iterator < matrix_size:	
+		var matrix_row_iterator = 0
+		while matrix_row_iterator < matrix_size:
+			var matrix_item = rotation_collision_matrix[matrix_column_iterator][matrix_row_iterator]
+			if matrix_item is Block:
+				if piece_pos.x + matrix_column_iterator - 1 < 0:
 					return false
-				matrix_column_iterator += 1
-			return true
-		else:
-			return false
-	else:
-		return false
+				else: 
+					var grid_item = _grid_contents[piece_pos.x + matrix_column_iterator - 1][piece_pos.y + matrix_row_iterator]
+					if grid_item is Block:
+						return false
+			matrix_row_iterator += 1
+		matrix_column_iterator += 1
+	return true
+
+
+func _can_piece_move_right() -> bool: 
+	var piece_pos = _active_piece.get_grid_position()
+	var rotation_collision_matrix = _active_piece.get_current_rotation_matrix().duplicate(true)
+	var matrix_size = rotation_collision_matrix.size()
+	var matrix_column_iterator = matrix_size - 1
+	
+	while matrix_column_iterator >= 0:	
+		var matrix_row_iterator = 0
+		while matrix_row_iterator < matrix_size:
+			var matrix_item = rotation_collision_matrix[matrix_column_iterator][matrix_row_iterator]
+			if matrix_item is Block:
+				if piece_pos.x + matrix_column_iterator + 1 >= _grid_dimensions.x:
+					return false
+				else: 
+					var grid_item = _grid_contents[piece_pos.x + matrix_column_iterator + 1][piece_pos.y + matrix_row_iterator]
+					if grid_item is Block:
+						return false
+			matrix_row_iterator += 1
+		matrix_column_iterator -= 1
+	return true
 
 
 func _print_the_grid():
