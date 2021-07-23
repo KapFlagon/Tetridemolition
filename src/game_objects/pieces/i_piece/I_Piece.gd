@@ -29,11 +29,16 @@ func print_piece_details() -> String:
 
 
 func _build_base_rotation_matrix():
-	var row_01 = [null, null, null, null]					# [ ], [ ], [ ], [ ]
-	var row_02 = [$BlockA, $BlockB, $BlockC, $BlockD]		# [x], [x], [x], [x]
-	var row_03 = [null, null, null, null]					# [ ]. [ ], [ ], [ ]
-	var row_04 = [null, null, null, null]					# [ ]. [ ], [ ], [ ]
-	_base_rotation_matrix = [row_01, row_02, row_03, row_04]
+	# [ col_01,	col_02,	col_03,	col_04]
+	#   [ ],	[ ], 	[ ], 	[ ]
+	#   [x], 	[x], 	[x], 	[x]
+	#   [ ].	[ ], 	[ ], 	[ ]
+	#   [ ].	[ ], 	[ ], 	[ ]
+	var col_01 = [null, $BlockA, null, null]
+	var col_02 = [null, $BlockB, null, null]
+	var col_03 = [null, $BlockC, null, null]
+	var col_04 = [null, $BlockD, null, null]
+	_base_rotation_matrix = [col_01, col_02, col_03, col_04]
 	_current_rotation_matrix = _base_rotation_matrix.duplicate(true)
 
 
