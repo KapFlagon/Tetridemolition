@@ -13,14 +13,14 @@ func _ready() -> void:
 	self._local_rotation_matrix_dimensions = 4
 	_build_base_rotation_matrix()
 	_rotation_checks_dictionary = {
-		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_NINETY: [ [0,0], [-2,0], [1,0], [-2,-1], [1,2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ZERO: [ [0,0], [2,0], [-1,0], [2,1], [-1,-2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ONEHUNDREDEIGHTY: [ [0,0], [-1,0], [2,0], [-1,2], [2,-1] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_NINETY: [ [0,0], [1,0], [-2,0], [1,-2], [-2,1] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_TWOHUNDREDSEVENTY: [ [0,0], [2,0], [-1,0], [2,1], [-1,-2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ONEHUNDREDEIGHTY: [ [0,0], [-2,0], [1,0], [-2,-1], [1,2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ZERO: [ [0,0], [1,0], [-2,0], [1,-2], [-2,1] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_TWOHUNDREDSEVENTY: [ [0,0], [-1,0], [2,0], [-1,2], [2,-1] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_NINETY: [ Vector2(0,0), Vector2(-2,0), Vector2(1,0), Vector2(-2,-1), Vector2(1,2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ZERO: [ Vector2(0,0), Vector2(2,0), Vector2(-1,0), Vector2(2,1), Vector2(-1,-2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ONEHUNDREDEIGHTY: [ Vector2(0,0), Vector2(-1,0), Vector2(2,0), Vector2(-1,2), Vector2(2,-1) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_NINETY: [ Vector2(0,0), Vector2(1,0), Vector2(-2,0), Vector2(1,-2), Vector2(-2,1) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_TWOHUNDREDSEVENTY: [ Vector2(0,0), Vector2(2,0), Vector2(-1,0), Vector2(2,1), Vector2(-1,-2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ONEHUNDREDEIGHTY: [ Vector2(0,0), Vector2(-2,0), Vector2(1,0), Vector2(-2,-1), Vector2(1,2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ZERO: [ Vector2(0,0), Vector2(1,0), Vector2(-2,0), Vector2(1,-2), Vector2(-2,1) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_TWOHUNDREDSEVENTY: [ Vector2(0,0), Vector2(-1,0), Vector2(2,0), Vector2(-1,2), Vector2(2,-1) ],
 	}
 
 
