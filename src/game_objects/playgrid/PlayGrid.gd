@@ -10,8 +10,8 @@ var _grid_dimensions: Vector2
 var _grid_contents
 var _x_limit
 var _y_limit
-var _active_piece: Tetromino setget set_active_piece
-var _input_hold_delta: float
+var _active_piece: Piece setget set_active_piece
+var _input_hold_delta: float 
 var _decent_speed: float setget set_decent_speed
 var _soft_drop_speed: float
 var _horizontal_movement_speed: float
@@ -31,7 +31,7 @@ func _ready():
 	_x_limit = _block_dimensions.x * (_grid_dimensions.x - 1)
 	_y_limit = _block_dimensions.y * (_grid_dimensions.y - 1)
 	_input_hold_delta = 0.0
-	_decent_speed = 0.1
+	_decent_speed = 1
 	_soft_drop_speed = 0.3
 	_horizontal_movement_speed = 0.015
 	_vertical_movement_delta = 0.0
@@ -62,6 +62,10 @@ func set_active_piece(new_active_piece) -> void:
 	add_child(_active_piece)
 	_set_spawn_position()
 
+func pop_active_piece() -> Piece:
+	remove_child(_active_piece)
+	return _active_piece
+
 
 func _set_spawn_position():
 	if _active_piece is O_Piece:
@@ -74,6 +78,7 @@ func _process_user_input(delta):
 	var piece_current_position = _active_piece.get_grid_position()
 	var left_direction_vector = Vector2(-1, 0)
 	var right_direction_vector = Vector2(1, 0)
+	var down_direction_vector = Vector2(0,1)
 	
 	if Input.is_action_just_pressed("move_left"):
 		if _can_piece_move_left():
@@ -90,13 +95,35 @@ func _process_user_input(delta):
 	if Input.is_action_just_released("move_left") or Input.is_action_just_released("move_right") or Input.is_action_just_released("soft_drop"):
 		_input_hold_delta = 0
 		_horizontal_movement_delta = 0
-	if Input.is_action_pressed("soft_drop") and _input_hold_delta > _hold_input_threshold:
+	if Input.is_action_pressed("soft_drop"):# and _input_hold_delta > _hold_input_threshold:
+		if _can_piece_move_down():
+			_process_held_movement_inputs(delta, piece_current_position, down_direction_vector)
 		pass
 	if Input.is_action_just_pressed("hard_drop"):
 		pass
 	if Input.is_action_just_pressed("rotate_right"):
+		var current_orientation = _active_piece.get_current_piece_orientation()
+		var target_orientation = _active_piece.get_current_piece_orientation() + 1
+		if target_orientation >= GameEnums.PIECE_ORIENTATION.size():
+			target_orientation = GameEnums.PIECE_ORIENTATION.ZERO_DEGREES
+		var next_rotation = _active_piece.build_next_rotation_preview(GameEnums.ROTATION_DIRECTION.RIGHT)
+		var rotation_test_result = _check_piece_rotation(current_orientation, target_orientation, next_rotation)
+		if rotation_test_result[0]:
+			var current_position = _active_piece.get_grid_position()
+			var new_position = current_position + rotation_test_result[1]
+			_active_piece.update_rotation_data(next_rotation, target_orientation, new_position)
 		pass
 	if Input.is_action_just_pressed("rotate_left"):
+		var current_orientation = _active_piece.get_current_piece_orientation()
+		var target_orientation = _active_piece.get_current_piece_orientation() - 1
+		if target_orientation < 0:
+			target_orientation = GameEnums.PIECE_ORIENTATION.TWOSEVENTY_DEGREES
+		var next_rotation = _active_piece.build_next_rotation_preview(GameEnums.ROTATION_DIRECTION.LEFT)
+		var rotation_test_result = _check_piece_rotation(current_orientation, target_orientation, next_rotation)
+		if rotation_test_result[0]:
+			var current_position = _active_piece.get_grid_position()
+			var new_position = current_position + rotation_test_result[1]
+			_active_piece.update_rotation_data(next_rotation, target_orientation, new_position)
 		pass
 
 
@@ -134,7 +161,6 @@ func _copy_active_piece_to_grid():
 				_grid_contents[piece_final_position.x + column_counter][piece_final_position.y + row_counter] = resting_block
 			column_counter += 1
 		row_counter += 1
-	#_print_the_grid()
 
 
 func _can_piece_move_down() -> bool:
@@ -260,3 +286,63 @@ func _process_held_movement_inputs(delta, piece_current_position, direction_vect
 func _move_piece_in_direction_using_vector(piece_current_position, direction_vector): 
 	var new_position = piece_current_position + direction_vector
 	_active_piece.set_grid_position(new_position)
+
+
+func _check_piece_rotation(current_orientation, target_orientation, rotation_collision_matrix_preview):
+	var wall_kicks_dictionary = _active_piece.get_rotation_checks_dictionary().duplicate(true)
+	var positions
+	match current_orientation:
+		GameEnums.PIECE_ORIENTATION.ZERO_DEGREES:
+			if target_orientation == GameEnums.PIECE_ORIENTATION.NINTY_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_NINETY]
+			elif target_orientation == GameEnums.PIECE_ORIENTATION.TWOSEVENTY_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_TWOHUNDREDSEVENTY]
+			else: 
+				return [false]
+		GameEnums.PIECE_ORIENTATION.NINTY_DEGREES:
+			if target_orientation == GameEnums.PIECE_ORIENTATION.ONEHUNDREDEIGHTY_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ONEHUNDREDEIGHTY]
+			elif target_orientation == GameEnums.PIECE_ORIENTATION.ZERO_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ZERO]
+			else: 
+				return [false]
+		GameEnums.PIECE_ORIENTATION.ONEHUNDREDEIGHTY_DEGREES:
+			if target_orientation == GameEnums.PIECE_ORIENTATION.TWOSEVENTY_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_TWOHUNDREDSEVENTY]
+			elif target_orientation == GameEnums.PIECE_ORIENTATION.NINTY_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_NINETY]
+			else: 
+				return [false]
+		GameEnums.PIECE_ORIENTATION.TWOSEVENTY_DEGREES:
+			if target_orientation == GameEnums.PIECE_ORIENTATION.ZERO_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ZERO]
+			elif target_orientation == GameEnums.PIECE_ORIENTATION.ONEHUNDREDEIGHTY_DEGREES:
+				positions = wall_kicks_dictionary[GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ONEHUNDREDEIGHTY]
+			else: 
+				return [false]
+	for offset_position in positions:
+		var result = _check_matrix_against_grid(offset_position, rotation_collision_matrix_preview)
+		if result:
+			return [true, offset_position]
+	return [false]
+	# perform the turn
+
+
+func _check_matrix_against_grid(offset_vector2, collision_rotation_matrix):
+	var limit = collision_rotation_matrix.size()
+	var column = 0
+	while column < limit: 
+		var row = 0
+		while row < limit:
+			var matrix_item = collision_rotation_matrix[column][row]
+			if matrix_item is Block:
+				var item_check_position = _active_piece.get_grid_position() + offset_vector2 + Vector2(column, row)
+				if item_check_position.x >= _grid_dimensions.x or item_check_position.x < 0 or item_check_position.y >= _grid_dimensions.y:
+					return false
+				else:
+					var grid_item = _grid_contents[item_check_position.x][item_check_position.y]
+					if grid_item is Block:
+						return false
+			row += 1
+		column += 1
+	return true
