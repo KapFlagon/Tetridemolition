@@ -29,10 +29,8 @@ func _build_base_rotation_matrix():
 
 
 func _calculate_next_right_rotation_matrix():
-	# Override to actually prevent piece rotation
-	pass
+	return _current_rotation_matrix
 
 
 func _calculate_next_left_rotation_matrix():
-	# Override to actually prevent piece rotation
-	pass
+	return _current_rotation_matrix
