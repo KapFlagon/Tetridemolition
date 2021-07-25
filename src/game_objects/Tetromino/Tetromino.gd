@@ -36,14 +36,14 @@ func _ready() -> void:
 	_update_colours()
 	_current_piece_orientation = GameEnums.PIECE_ORIENTATION.ZERO_DEGREES
 	_rotation_checks_dictionary = {
-		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_NINETY: [ [0,0], [-1,0], [-1,1], [0,-2], [-1,-2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ZERO: [ [0,0], [1,0], [1,-1], [0,2], [1,2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ONEHUNDREDEIGHTY: [ [0,0], [1,0], [1,-1], [0,2], [1,2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_NINETY: [ [0,0], [-1,0], [-1,1], [0,-2], [-1,-2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_TWOHUNDREDSEVENTY: [ [0,0], [1,0], [1,1], [0,-2], [1,-2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ONEHUNDREDEIGHTY: [ [0,0], [-1,0], [-1,-1], [0,2], [-1,2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ZERO: [ [0,0], [-1,0], [-1,-1], [0,2], [-1,2] ],
-		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_TWOHUNDREDSEVENTY: [ [0,0], [1,0], [1,1], [0,-2], [1,-2] ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_NINETY: [ Vector2(0,0), Vector2(-1,0), Vector2(-1,1), Vector2(0,-2), Vector2(-1,-2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ZERO: [ Vector2(0,0), Vector2(1,0), Vector2(1,-1), Vector2(0,2), Vector2(1,2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.NINETY_TO_ONEHUNDREDEIGHTY: [ Vector2(0,0), Vector2(1,0), Vector2(1,-1), Vector2(0,2), Vector2(1,2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_NINETY: [ Vector2(0,0), Vector2(-1,0), Vector2(-1,1), Vector2(0,-2), Vector2(-1,-2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ONEHUNDREDEIGHTY_TO_TWOHUNDREDSEVENTY: [ Vector2(0,0), Vector2(1,0), Vector2(1,1), Vector2(0,-2), Vector2(1,-2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ONEHUNDREDEIGHTY: [ Vector2(0,0), Vector2(-1,0), Vector2(-1,-1), Vector2(0,2), Vector2(-1,2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.TWOHUNDREDSEVENTY_TO_ZERO: [ Vector2(0,0), Vector2(-1,0), Vector2(-1,-1), Vector2(0,2), Vector2(-1,2) ],
+		GameEnums.PIECE_ROTATION_MOVEMENT.ZERO_TO_TWOHUNDREDSEVENTY: [ Vector2(0,0), Vector2(1,0), Vector2(1,1), Vector2(0,-2), Vector2(1,-2) ],
 	}
 
 func _init() -> void:
@@ -140,7 +140,7 @@ func _build_base_rotation_matrix():
 	print_rotation_matrix(_base_rotation_matrix)
 
 
-func _build_next_rotation(target_direction):
+func build_next_rotation_preview(target_direction):
 	match target_direction:
 		GameEnums.ROTATION_DIRECTION.RIGHT:
 			return _calculate_next_right_rotation_matrix()
@@ -148,7 +148,7 @@ func _build_next_rotation(target_direction):
 			return _calculate_next_left_rotation_matrix()
 
 
-func _calculate_next_right_rotation_matrix():
+func _calculate_next_left_rotation_matrix():
 	var existing_matrix = _current_rotation_matrix.duplicate(true)
 	var new_matrix = _current_rotation_matrix.duplicate(true)
 	var x1 = _current_rotation_matrix.size() -1
@@ -167,7 +167,7 @@ func _calculate_next_right_rotation_matrix():
 	return new_matrix
 
 
-func _calculate_next_left_rotation_matrix():
+func _calculate_next_right_rotation_matrix():
 	var existing_matrix = _current_rotation_matrix.duplicate(true)
 	var new_matrix = _current_rotation_matrix.duplicate(true)
 	var x1 = 0
@@ -202,15 +202,16 @@ func print_rotation_matrix(rotation_matrix):
 		print(row_output)
 
 
-func _process_wall_kicks(_original_orientation, _target_orientation, _grid_local_matrix):
-	pass
-
-
-func rotate_piece_right(_grid_local_matrix):
-	# TODO May need to examine the parameters passed to this further. 
-	pass
-
-
-func rotate_piece_left(_grid_local_matrix):
-	pass
-
+func update_rotation_data(next_rotation_matrix, target_orientation, new_grid_position):
+	_current_rotation_matrix = next_rotation_matrix
+	_current_piece_orientation = target_orientation
+	_grid_position = new_grid_position
+	match target_orientation:
+		GameEnums.PIECE_ORIENTATION.ZERO_DEGREES:
+			set_rotation_degrees(0)
+		GameEnums.PIECE_ORIENTATION.NINTY_DEGREES:
+			set_rotation_degrees(90)
+		GameEnums.PIECE_ORIENTATION.ONEHUNDREDEIGHTY_DEGREES:
+			set_rotation_degrees(180)
+		GameEnums.PIECE_ORIENTATION.TWOSEVENTY_DEGREES:
+			set_rotation_degrees(270)
