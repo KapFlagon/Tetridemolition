@@ -1,5 +1,9 @@
 extends Node2D
 
+# TODO: Implement a ghost piece/placement preview piece. 
+# TODO: Implement line clears and feeding data to be used for scoring. 
+# TODO: Signal a Top out for gameover
+# TODO: Implement the hard drop. 
 
 signal active_piece_fixed
 signal lines_cleared
@@ -129,7 +133,6 @@ func _process_user_input(delta):
 
 func _move_piece_down(delta):
 	_vertical_movement_delta += delta
-	# TODO need a better way to alter the speed etc. 
 	if _active_piece != null and _vertical_movement_delta > _decent_speed:
 		_vertical_movement_delta = 0
 		if _can_piece_move_down():
@@ -140,6 +143,7 @@ func _move_piece_down(delta):
 		else: 
 			if _active_piece != null:
 				_copy_active_piece_to_grid()
+				
 				emit_signal("active_piece_fixed")
 	pass
 
@@ -346,3 +350,5 @@ func _check_matrix_against_grid(offset_vector2, collision_rotation_matrix):
 			row += 1
 		column += 1
 	return true
+
+ 
