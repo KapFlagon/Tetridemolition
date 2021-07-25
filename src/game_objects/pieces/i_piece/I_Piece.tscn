@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://src/game_objects/pieces/i_piece/I_Piece.gd" type="Script" id=1]
-[ext_resource path="res://src/game_objects/Tetromino/Tetromino.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/game_objects/piece/Piece.tscn" type="PackedScene" id=2]
 
 [node name="I_Piece" instance=ExtResource( 2 )]
 script = ExtResource( 1 )

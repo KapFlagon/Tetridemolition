@@ -3,7 +3,7 @@ tool
 extends Node2D
 
 
-class_name Tetromino
+class_name Piece
 
 
 signal colour_value_altered
@@ -215,3 +215,9 @@ func update_rotation_data(next_rotation_matrix, target_orientation, new_grid_pos
 			set_rotation_degrees(180)
 		GameEnums.PIECE_ORIENTATION.TWOSEVENTY_DEGREES:
 			set_rotation_degrees(270)
+
+
+func reset_rotation_data():
+	_current_rotation_matrix = _base_rotation_matrix.duplicate(true)
+	_current_piece_orientation = GameEnums.PIECE_ORIENTATION.ZERO_DEGREES
+	set_rotation_degrees(0)

@@ -1,7 +1,7 @@
 tool
 
 
-extends Tetromino
+extends Piece
 
 
 class_name L_Piece
