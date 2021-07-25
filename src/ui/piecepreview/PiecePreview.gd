@@ -36,5 +36,4 @@ func _update_all_positions() -> void:
 	while iterator < pieces.size():
 		pieces[iterator].position.x = 90
 		pieces[iterator].position.y = 45 - pieces[iterator].get_offsets().y + (90 * iterator)
-		# TODO need to adjust positions better
 		iterator += 1
