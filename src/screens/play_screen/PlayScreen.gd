@@ -14,6 +14,7 @@ func _ready():
 	_active_piece = _random_piece_generator.pop_next_piece()
 	_piece_preview.add_new_preview_piece(_random_piece_generator.preview_next_piece())
 	_playgrid.connect("ready_for_next_piece",self,"_get_next_piece")
+	_playgrid.connect("top_out_detected",self,"_on_PlayGrid_top_out_detected")
 	_get_next_piece()
 	pass
 
