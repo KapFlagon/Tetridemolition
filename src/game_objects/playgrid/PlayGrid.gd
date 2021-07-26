@@ -7,7 +7,7 @@ extends Node2D
 
 signal active_piece_fixed
 signal ready_for_next_piece
-signal lines_cleared
+signal lines_cleared(amount_of_cleared_lines)
 signal game_over
 
 var _block_dimensions: Vector2
@@ -355,7 +355,7 @@ func _check_matrix_against_grid(offset_vector2, collision_rotation_matrix):
 
  
 func _try_to_clear_lines():
-	var cleared_lines = 0
+	var cleared_lines_count = 0
 	var row = 0
 	while row < _grid_dimensions.y:
 		var columns_with_blocks = 0
@@ -365,6 +365,7 @@ func _try_to_clear_lines():
 				columns_with_blocks += 1
 			current_column += 1
 		if columns_with_blocks == _grid_dimensions.x:
+			cleared_lines_count += 1
 			var deletion_column = 0
 			while deletion_column < columns_with_blocks:
 				_grid_contents[deletion_column][row].queue_free()
@@ -381,4 +382,6 @@ func _try_to_clear_lines():
 					row_iterator += 1
 				column_iterator += 1
 		row += 1
+	if cleared_lines_count > 0:
+		emit_signal("lines_cleared", cleared_lines_count)
 	emit_signal("ready_for_next_piece")
