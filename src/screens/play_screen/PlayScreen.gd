@@ -40,3 +40,8 @@ func _hold_piece():
 			else:
 				_active_piece = swapped_piece
 				_playgrid.set_active_piece(_active_piece)
+
+
+func _on_PlayGrid_top_out_detected():
+	_playgrid._grid_active = false
+	print("game over")
