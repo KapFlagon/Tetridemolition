@@ -8,8 +8,9 @@ extends Node2D
 signal active_piece_fixed
 signal ready_for_next_piece
 signal lines_cleared(amount_of_cleared_lines)
-signal game_over
+signal top_out_detected
 
+var _grid_active: bool 
 var _block_dimensions: Vector2
 var _grid_dimensions: Vector2
 var _grid_contents
@@ -31,6 +32,7 @@ var _block_instancing = preload("res://src/game_objects/block/Block.tscn")
 ##############################################
 ##############################################
 func _ready():
+	_grid_active = true
 	_block_dimensions = Vector2(30,30)
 	_grid_dimensions = Vector2(10,22)
 	_x_limit = _block_dimensions.x * (_grid_dimensions.x - 1)
@@ -51,9 +53,11 @@ func _ready():
 
 
 func _process(delta):
-	_process_user_input(delta)
-	_update_projected_piece()
-	_move_piece_down(delta)
+	if _grid_active:
+		_process_user_input(delta)
+		_update_projected_piece()
+		_check_for_top_out()
+		_move_piece_down(delta)
 
 
 ##############################################
@@ -385,3 +389,14 @@ func _try_to_clear_lines():
 	if cleared_lines_count > 0:
 		emit_signal("lines_cleared", cleared_lines_count)
 	emit_signal("ready_for_next_piece")
+
+
+func _check_for_top_out():
+	var column = 0
+	while column < _grid_dimensions.x:
+		var row = 0
+		while row < 2:
+			if _grid_contents[column][row] is Block:
+				emit_signal("top_out_detected")
+			row += 1
+		column += 1
