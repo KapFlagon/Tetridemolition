@@ -13,8 +13,7 @@ func _ready():
 	_piece_preview.add_initial_preview_pieces(_random_piece_generator.preview_next_three_pieces())
 	_active_piece = _random_piece_generator.pop_next_piece()
 	_piece_preview.add_new_preview_piece(_random_piece_generator.preview_next_piece())
-	_playgrid.connect("active_piece_fixed",self,"_get_next_piece")
-	#_playgrid.set_active_piece(_active_piece)
+	_playgrid.connect("ready_for_next_piece",self,"_get_next_piece")
 	_get_next_piece()
 	pass
 
@@ -27,7 +26,6 @@ func _process(delta):
 
 
 func _get_next_piece():
-	#_active_piece.queue_free()
 	_active_piece = _random_piece_generator.pop_next_piece()
 	_piece_preview.add_new_preview_piece(_random_piece_generator.preview_next_piece())
 	_playgrid.set_active_piece(_active_piece)
