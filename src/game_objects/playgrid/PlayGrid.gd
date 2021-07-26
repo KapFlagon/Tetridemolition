@@ -6,6 +6,7 @@ extends Node2D
 # TODO: Implement the hard drop. 
 
 signal active_piece_fixed
+signal ready_for_next_piece
 signal lines_cleared
 signal game_over
 
@@ -46,12 +47,13 @@ func _ready():
 		_grid_contents.append([])
 		for _rows in range(_grid_dimensions.y):
 			_grid_contents[column].append(null)
+	connect("active_piece_fixed",self,"_on_active_piece_fixed")
 
 
 func _process(delta):
 	_process_user_input(delta)
-	_move_piece_down(delta)
 	_update_projected_piece()
+	_move_piece_down(delta)
 
 
 ##############################################
@@ -143,7 +145,6 @@ func _move_piece_down(delta):
 		else: 
 			if _active_piece != null:
 				_copy_active_piece_to_grid()
-				
 				emit_signal("active_piece_fixed")
 	pass
 
@@ -165,6 +166,7 @@ func _copy_active_piece_to_grid():
 				_grid_contents[piece_final_position.x + column_counter][piece_final_position.y + row_counter] = resting_block
 			column_counter += 1
 		row_counter += 1
+	_active_piece.queue_free()
 
 
 func _can_piece_move_down() -> bool:
@@ -271,8 +273,8 @@ func _update_projected_piece():
 	pass
 
 
-func _on_PlayGrid_active_piece_fixed():
-	# Check for any line clears
+func _on_active_piece_fixed():
+	_try_to_clear_lines()
 	pass # Replace with function body.
 
 
@@ -352,3 +354,31 @@ func _check_matrix_against_grid(offset_vector2, collision_rotation_matrix):
 	return true
 
  
+func _try_to_clear_lines():
+	var cleared_lines = 0
+	var row = 0
+	while row < _grid_dimensions.y:
+		var columns_with_blocks = 0
+		var current_column = 0
+		while current_column < _grid_dimensions.x:
+			if _grid_contents[current_column][row] is Block:
+				columns_with_blocks += 1
+			current_column += 1
+		if columns_with_blocks == _grid_dimensions.x:
+			var deletion_column = 0
+			while deletion_column < columns_with_blocks:
+				_grid_contents[deletion_column][row].queue_free()
+				_grid_contents[deletion_column].remove(row)
+				_grid_contents[deletion_column].push_front(null)
+				deletion_column += 1
+			var column_iterator = 0
+			while column_iterator < _grid_dimensions.x:
+				var row_iterator = 0
+				while row_iterator < _grid_dimensions.y:
+					var new_position = Vector2(column_iterator, row_iterator)
+					if _grid_contents[column_iterator][row_iterator] != null :
+						_grid_contents[column_iterator][row_iterator].set_grid_position(new_position)
+					row_iterator += 1
+				column_iterator += 1
+		row += 1
+	emit_signal("ready_for_next_piece")

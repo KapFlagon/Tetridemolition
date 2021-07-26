@@ -327,5 +327,3 @@ margin_bottom = -29.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[connection signal="active_piece_fixed" from="." to="." method="_on_PlayGrid_active_piece_fixed"]
