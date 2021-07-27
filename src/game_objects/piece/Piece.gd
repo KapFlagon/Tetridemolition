@@ -17,7 +17,7 @@ onready var _block_b = $BlockB
 onready var _block_c = $BlockC
 onready var _block_d = $BlockD
 onready var _blocks = [_block_a, _block_b, _block_c, _block_d] setget set_blocks, get_blocks
-export var _colour: Color setget, get_colour
+export var _colour: Color setget set_colour, get_colour
 var _grid_position: Vector2 setget set_grid_position, get_grid_position
 var _moving: bool setget set_moving, is_moving
 var _moving_speed: float setget set_moving_speed, get_moving_speed
@@ -80,6 +80,10 @@ func get_blocks():
 func get_block_dimensions():
 	return $BlockA.get_block_dimensions()
 
+
+func set_colour(new_colour): 
+	_colour = new_colour
+	_update_colours()
 
 func get_colour():
 	return _colour
@@ -205,7 +209,7 @@ func print_rotation_matrix(rotation_matrix):
 func update_rotation_data(next_rotation_matrix, target_orientation, new_grid_position):
 	_current_rotation_matrix = next_rotation_matrix
 	_current_piece_orientation = target_orientation
-	_grid_position = new_grid_position
+	set_grid_position(new_grid_position)
 	match target_orientation:
 		GameEnums.PIECE_ORIENTATION.ZERO_DEGREES:
 			set_rotation_degrees(0)
